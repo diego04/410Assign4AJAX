@@ -26,20 +26,9 @@
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
     <script>
 var canvas = document.getElementById('c');
-
-//window represents an open window in a browser
-//-location contains information about the current url
-//--host sets or returns the hostname and port of a URL
-var host = window.location.host; // I dont know why this is here
-
-//canvas is the drawing board and is a container for graphics
-//getContext() returns an object that provides methods and properties for drawing on the canvas
+var host = window.location.host;
 var context = canvas.getContext("2d");
-
-//returns width of of an imagedata object, which should be equal to the width of the window and assign to canvas
 var W = canvas.width  = window.innerWidth-6;
-
-//returns the height  of an imagedata object 	which would be equal to the height of the window and assign to canvas 
 var H = canvas.height = window.innerHeight-50;
 
 
@@ -51,6 +40,8 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+                    
+                    //document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
                 }
             } 
             catch(e) {
@@ -58,44 +49,40 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
             }
         }
     };
+    
+    //xhr.open("POST","http://localhost:5000/entity/ei",true)
+    xhr.open("POST","/entity/ei",true)
+    xhr.setRequestHeader("Accept-Type", "*/*");
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    //JSON.stringify(world[property])
+    xhr.send(JSON.stringify(world));
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
-}
+} //sendjsonxmlhttprequest
 
 
 world = {};
 
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
-
-	//var context = canvas.getContext("2d");
-	//so context gets assigned with the following attributes
     with(context) {
-    	//begins or restarts a path
         beginPath();              
         lineWidth = 3;
-        var x = strokeStyle["x"];
+        var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        //the fillStyle property sets or returns the color, gradient, or pattern used to fill the drawing.
         fillStyle = entity["colour"];
-        //The strokeStyle property sets or returns the color, gradient, or pattern used for strokes.
         strokeStyle = fillStyle;
-        
-        //arc X(centerx,centery, radius, startangle, endangle, counterclockwise? )
-        //radius has ternary operator condition? true:false
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
         stroke();                                
     }
 }
 
 function prepEntity(entity) {
-	//if our entity has no color assign red
     if (!entity["colour"]) {
         entity["colour"] = "#FF0000";
     }
-    //if entity has no radius assign 50
     if (!entity["radius"]) {
         entity["radius"] = 50;
     }
@@ -106,7 +93,6 @@ function clearFrame() {
     with(context) {
 	moveTo(0,0);
 	fillStyle = "#000";
-	//fillrect(centerx, centery , width of canvas in pixels, height of canvas in pixels)
 	fillRect(0,0,W,H);
     }
 
@@ -160,6 +146,9 @@ function getPosition(e) {
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
+    
+    sendJSONXMLHTTPRequest("", world, ""); 
+
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 
 }
@@ -189,6 +178,7 @@ mouse = (function() {
         callListeners: function(listeners,x,y,clicked,e) {
             for (i in listeners) {
                 listeners[i](x,y,clicked,e);
+                //alert(listeners[i]);
             }
         },
         wasClicked: function(e) {
@@ -285,11 +275,18 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+	//var output = '';
+	//for (var property in world) {
+	 // output += property + ': ' + JSON.stringify(world[property])+'; ';
+	//}	
+	//alert(JSON.stringify(world]));
     drawFrame();
 }
 
 // 30 frames per second
 setInterval( update, 1000/30.0);
+//setInterval( update, 3000);
+
 
 
 

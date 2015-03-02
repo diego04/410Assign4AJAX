@@ -22,16 +22,27 @@
 
 
 import flask
-from flask import Flask, request
+from flask import Flask, request, Blueprint
+from flask import render_template
+
+
 import json
 app = Flask(__name__)
 app.debug = True
+
 
 # An example world
 # {
 #    'a':{'x':1, 'y':2},
 #    'b':{'x':2, 'y':3}
 # }
+
+profile = Blueprint('profile', __name__,
+                    template_folder='static',
+                    static_folder='static')
+                    
+app.register_blueprint(profile)
+
 
 class World:
     def __init__(self):
@@ -74,27 +85,64 @@ def flask_post_json():
 @app.route("/")
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
-    return None
+    #print "myworld" + str(myWorld)
+    return render_template('index.html')
 
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
+    #content = request.json
+    #myWorld = request.data
+    content = request.data
+    #dictionary
+    x =  json.loads(content)
+    #update set
+    """
+    for key, value in x.iteritems():
+    	#print type(value)
+    	print type(value)
+    	print value
+    	#myWorld.set(entity,value)
+    	print(myWorld.world())
+    	print type(key)
+    	print key"""
+    #data_string = json.dumps(data) #python to json
+    #data_string = json.loads(data) #json to python
+
+    myWorld.set(entity,x)
+    #myWorld.clear()
+    #print(myWorld.set(entity,x))
+    #print(myWorld.world())
+    #print(myWorld.get(entity))
+    #print entity
     '''update the entities via this interface'''
-    return None
+    return "OK"
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
-    return None
+    #myWorld.world()
+    data_string = json.dumps(myWorld.world()) #python to json
+
+    return data_string
+
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
+    #print entity
+    #data_string = json.dumps(data) #python to json
+    #data_string = json.loads(data) #json to python
+
+    #myWorld.get(entity)
+    data_string = json.dumps(myWorld.get(entity)) #python to json
+
     '''This is the GET version of the entity interface, return a representation of the entity'''
-    return None
+    return data_string
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
+    myWorld.clear()
     '''Clear the world out!'''
-    return None
+    return "OK"
 
 if __name__ == "__main__":
     app.run()
