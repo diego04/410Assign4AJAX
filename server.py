@@ -41,7 +41,7 @@ profile = Blueprint('profile', __name__,
                     template_folder='static',
                     static_folder='static')
                     
-app.register_blueprint(profile)
+app.register_blueprint(profile, url_prefix='')
 
 
 class World:
