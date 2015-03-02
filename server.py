@@ -88,13 +88,17 @@ def hello():
     #print "myworld" + str(myWorld)
     return render_template('index.html')
 
+#entity is dict with keys and values
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
     #content = request.json
     #myWorld = request.data
-    content = request.data
+    #content = request.data
     #dictionary
-    x =  json.loads(content)
+    #x =  json.loads(content)
+    #print flask_post_json()
+    #print "break"
+    
     #update set
     """
     for key, value in x.iteritems():
@@ -107,15 +111,16 @@ def update(entity):
     	print key"""
     #data_string = json.dumps(data) #python to json
     #data_string = json.loads(data) #json to python
-
-    myWorld.set(entity,x)
+    #for x in flask_post_json().keys():
+	#	myWorld.update(entity, x, flask_post_json()[x])
+    myWorld.set(entity,flask_post_json())
     #myWorld.clear()
     #print(myWorld.set(entity,x))
     #print(myWorld.world())
     #print(myWorld.get(entity))
     #print entity
     '''update the entities via this interface'''
-    return "OK"
+    return json.dumps(myWorld.get(entity))
 
 @app.route("/world", methods=['POST','GET'])    
 def world():

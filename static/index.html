@@ -40,8 +40,9 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
-                    
+                    callback(JSON.parse(xhr.responseText));
                     //document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                    //callback(response);
                 }
             } 
             catch(e) {
@@ -51,11 +52,13 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     };
     
     //xhr.open("POST","http://localhost:5000/entity/ei",true)
-    xhr.open("POST","/entity/ei",true)
-    xhr.setRequestHeader("Accept-Type", "*/*");
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.open("POST",url, true)
+    xhr.setRequestHeader("Accept", "*/*");
+    //xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("Content-Type", "application/json");
+
     //JSON.stringify(world[property])
-    xhr.send(JSON.stringify(world));
+    xhr.send(JSON.stringify(objects));
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
@@ -147,7 +150,9 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     
-    sendJSONXMLHTTPRequest("", world, ""); 
+    sendJSONXMLHTTPRequest("/entity/"+encodeURIComponent(entity),data, function(theresp){});
+    
+    //sendJSONXMLHTTPRequest("", world, ""); 
 
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 
@@ -280,6 +285,14 @@ function update() {
 	 // output += property + ': ' + JSON.stringify(world[property])+'; ';
 	//}	
 	//alert(JSON.stringify(world]));
+	
+	//ajax it here and set world
+	sendJSONXMLHTTPRequest("/world", null, function(theresponse){
+		world = theresponse;
+		drawNextFrame(); 
+		
+	});
+
     drawFrame();
 }
 
